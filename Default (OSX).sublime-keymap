@@ -1,0 +1,3 @@
+[
+    { "keys": ["ctrl+shift+l"], "command": "coffee_lint_code"}
+]

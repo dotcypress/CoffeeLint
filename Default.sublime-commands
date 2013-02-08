@@ -1,0 +1,6 @@
+[
+    {
+        "caption": "CoffeeLint: Lint code",
+        "command": "coffee_lint_code"
+    }
+]
