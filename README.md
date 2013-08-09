@@ -3,7 +3,7 @@ CoffeeLint
 
 Overview
 --------
-Sumlime Text 2 plugin for lint CoffeeScript files.
+Sublime Text 2 plugin for lint CoffeeScript files.
 
 Requirements
 ------------
@@ -19,3 +19,8 @@ Key bindings
 ------------
 
 `"ctrl+shift+l"`
+
+Menu
+------------
+
+You can change the default config in **Preferences>Packages Settings>Coffeelint**
