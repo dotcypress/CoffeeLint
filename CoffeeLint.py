@@ -9,10 +9,9 @@ import json
 TYPE_PANEL_NAME = 'CoffeeLintPanel'
 
 class CoffeeLintCodeCommand(sublime_plugin.TextCommand):
-    def call_exe(command):
+    def call_exe(self, command):
         try:
             extended_env = dict(os.environ)
-            settings = sublime.load_settings('CoffeeLint.sublime-settings')
             extended_env['PATH'] = os.getenv('PATH').encode('utf8', 'ignore')
             if self.settings.get('node_path') :
                 extended_env['PATH'] += ':' + self.settings.get('node_path')
@@ -36,16 +35,16 @@ class CoffeeLintCodeCommand(sublime_plugin.TextCommand):
         temp_file = tempfile.NamedTemporaryFile(delete=False)
         temp_file.write(content.encode('utf8'))
         temp_file.close()
-        config = create_create_config_file()
+        config = self.create_create_config_file()
         command.append('-f')
         command.append(config.name)
         command.append(temp_file.name)
-        result = call_exe(command)
+        result = self.call_exe(command)
         os.unlink(temp_file.name)
         os.unlink(config.name)
         return result
 
-    def create_create_config_file():
+    def create_create_config_file(self):
         config = tempfile.NamedTemporaryFile(delete=False)
         lint_config = self.settings.get('lint_config')
         content = json.dumps(lint_config, sort_keys=True, indent=4, separators=(',', ':'))
@@ -53,15 +52,15 @@ class CoffeeLintCodeCommand(sublime_plugin.TextCommand):
         config.close()
         return config
 
-    def show_output_panel(view, text):
-        output_view = view.window().get_output_panel(TYPE_PANEL_NAME)
+    def show_output_panel(self, text):
+        output_view = self.view.window().get_output_panel(TYPE_PANEL_NAME)
         output_view.set_read_only(False)
         output_view.sel().clear()
         edit = output_view.begin_edit()
         output_view.insert(edit, 0, text)
         output_view.end_edit(edit)
         output_view.set_read_only(True)
-        view.window().run_command('show_panel', {'panel': 'output.' + TYPE_PANEL_NAME})
+        self.view.window().run_command('show_panel', {'panel': 'output.' + TYPE_PANEL_NAME})
 
 
     def run(self, edit):
@@ -69,8 +68,8 @@ class CoffeeLintCodeCommand(sublime_plugin.TextCommand):
         selection = sublime.Region(0, self.view.size())
         dirname, _ = os.path.split(os.path.abspath(__file__))
         config = os.path.join(dirname, 'config.json')
-        result = call_exe_with_temp_file(self, ['coffeelint', '--nocolor'], self.view.substr(selection))
+        result = self.call_exe_with_temp_file(['coffeelint', '--nocolor'], self.view.substr(selection))
         data="\n".join(result.split('\n')[1:-1])
-        show_output_panel(self, self.view, data)
+        if data:
+            self.show_output_panel(data)
 
-    
