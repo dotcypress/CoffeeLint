@@ -13,10 +13,12 @@ class CoffeeLintCodeCommand(sublime_plugin.TextCommand):
         try:
             extended_env = dict(os.environ)
             extended_env['PATH'] = os.getenv('PATH').encode('utf8', 'ignore')
-            
+
             if os.name == 'nt' :
-                command[0] = 'coffeelint.cmd'                
-            else :                
+                command[0] = 'coffeelint.cmd'
+                shellMode = True
+            else :
+                shellMode = False
                 if self.settings.get('node_path') :
                     extended_env['PATH'] += ":" + self.settings.get('node_path')
                 if self.settings.get('coffeelint_path'):
@@ -25,8 +27,9 @@ class CoffeeLintCodeCommand(sublime_plugin.TextCommand):
             process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 env=extended_env,
-                shell=True,
+                shell=shellMode,
                 universal_newlines=True)
 
             stdout, stderr = process.communicate()
@@ -68,8 +71,7 @@ class CoffeeLintCodeCommand(sublime_plugin.TextCommand):
         self.view.window().run_command('show_panel', {'panel': 'output.' + TYPE_PANEL_NAME})
 
 
-    def run(self, edit):  
-        print edit
+    def run(self, edit):
         self.settings = sublime.load_settings('CoffeeLint.sublime-settings')
         selection = sublime.Region(0, self.view.size())
         dirname, _ = os.path.split(os.path.abspath(__file__))
